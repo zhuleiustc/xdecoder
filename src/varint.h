@@ -71,7 +71,7 @@ class Varint {
     uint8_t* target = &bytes[0];
     uint8_t* end = WriteVarint32ToArray(value, target);
     int size = end - target;
-    os.write(static_cast<char *>(bytes), sizeof(uint8_t) * size);
+    os.write(reinterpret_cast<char *>(bytes), sizeof(uint8_t) * size);
     return size;
   }
 
