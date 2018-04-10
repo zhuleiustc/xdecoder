@@ -1,0 +1,23 @@
+#!/bin/bash
+
+if [ $# -lt 1 ]; then 
+    echo "Usage git add file1, file2, ..."
+    exit 0;
+fi
+
+sum=0
+
+for file in $*; do
+    match=$(echo $file | grep -E '\.(h|cpp|cc)$' | wc -l)
+    if [ $match == 1 ]; then
+        cpplint --filter=-build/include_subdir $file
+        sum=$[${sum} + $?]
+    fi
+done
+
+if [ ${sum} -eq 0 ]; then
+    git add $*
+else
+    exit 1
+fi
+
