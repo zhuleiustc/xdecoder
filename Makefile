@@ -1,8 +1,9 @@
 CXX = g++
 
-CXXFLAGS = -g -std=c++11 -MMD -I src
+CXXFLAGS = -g -std=c++11 -MMD -Wall -I src
 
-OBJ = $(patsubst %.cc,%.o,$(wildcard src/*.cc))
+#OBJ = $(patsubst %.cc,%.o,$(wildcard src/*.cc))
+OBJ = src/fst.o src/utils.o
 
 TEST = test/varint-test
 

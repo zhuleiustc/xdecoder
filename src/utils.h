@@ -20,6 +20,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <iostream>
+
 namespace xdecoder {
 
 #define DISALLOW_COPY_AND_ASSIGN(Type) \
@@ -47,6 +49,20 @@ namespace xdecoder {
       exit(-1); \
     } \
   } while (0)
+
+
+// IO
+template<class T>
+void ReadBasic(std::istream &is, T* t);
+
+template<class T>
+void WriteBasic(std::ostream &os, T t);
+
+template<>
+void ReadBasic(std::istream &is, int32_t* t);
+
+template<>
+void WriteBasic(std::ostream &os, int32_t t);
 
 }  // namespace xdecoder
 
