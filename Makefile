@@ -7,7 +7,9 @@ OBJ = src/fst.o src/utils.o
 
 TEST = test/varint-test
 
-all: $(TEST) $(OBJ)
+TOOL = tools/fst-init tools/fst-info tools/fst-to-dot
+
+all: $(TEST) $(TOOL) $(OBJ)
 
 test: $(TEST)
 	@for x in $(TEST); do \
@@ -27,6 +29,9 @@ check:
 	done
 
 test/%: test/%.cc $(OBJ)
+	$(CXX) $< $(OBJ) $(CXXFLAGS) -o $@
+
+tools/%: tools/%.cc $(OBJ)
 	$(CXX) $< $(OBJ) $(CXXFLAGS) -o $@
 
 .PHONY: clean
