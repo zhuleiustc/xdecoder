@@ -7,7 +7,8 @@ OBJ = src/fst.o src/utils.o
 
 TEST = test/varint-test
 
-TOOL = tools/fst-init tools/fst-info tools/fst-to-dot
+TOOL = tools/fst-init tools/fst-info tools/fst-to-dot \
+       tools/transition-id-to-pdf
 
 all: $(TEST) $(TOOL) $(OBJ)
 

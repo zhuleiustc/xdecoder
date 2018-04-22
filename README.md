@@ -17,12 +17,11 @@ So serveral things should be taken into account.
 This is our solutions for the above requirements.
 
 ### Mini
-    1. AM, we will use quantizaton to reduce the model. 
-       The model size can be reduced to 1/4 if we use 8 bits quantization. And we can use SVD to compress the model further.
-    2. LM, LM here means the decoding FST file. Small LM should be used in our scenario. The basic unit of FST is arc, 
-       which is a tuple(ilabel, olabel, weight, next_state) with four elements in nature. And ilabel, olabel, next_state are int32 type, 
-       so we can use varint to reduce it.
-    3. lib, the third party library should be as less as possible.
+1. AM, we will use quantizaton to reduce the model. The model size can be reduced to 1/4 if we use 8 bits quantization. And we can use SVD to compress the model further.
+2. LM, LM here means the decoding FST file. Small LM should be used in our scenario. The basic unit of FST is arc,
+which is a tuple(ilabel, olabel, weight, next\_state) with four elements in nature. And ilabel, olabel, next\_state are int32 type, 
+so we can use varint to reduce it.
+3. lib, the third party library should be as less as possible.
 
 ### Fast
 
@@ -46,7 +45,11 @@ We can see the for this HCLG, the final xdecoder varint fst is only half of the 
 Compared with the xdecoder fst before varint, the xdecoder fst after varint cut off 44M file size, the compression ratio is 69%.
 I think we can get much bigger compression rate if the original fst is smaller.
 
+Another example is the transition id to pdf file, which has 4519 transitions and 2145 pdfs.
+We can see more than half compression rate after we use varint since all of the pdf ids are small integers.
 
-
-
+| Transition Id to Pdf File           | Size  |
+|-------------------------------------|-------|
+| transition id to pdf(before varint) | 18080 |
+| transition id to pdf(after varint)  | 8879  |
 
