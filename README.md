@@ -16,7 +16,7 @@ So serveral things should be taken into account.
 
 This is our solutions for the above requirements.
 
-- **Mini**
+### Mini
     1. AM, we will use quantizaton to reduce the model. 
        The model size can be reduced to 1/4 if we use 8 bits quantization. And we can use SVD to compress the model further.
     2. LM, LM here means the decoding FST file. Small LM should be used in our scenario. The basic unit of FST is arc, 
@@ -24,7 +24,28 @@ This is our solutions for the above requirements.
        so we can use varint to reduce it.
     3. lib, the third party library should be as less as possible.
 
-- **Fast**
+### Fast
+
+
+## eXperiments
+
+### Mini
+
+#### LM, HCLG compression
+    
+Xdecoders HCLG fst file is converted from kaldi HCLG openfst file. Here is a comparison of kaldi openfst file, xdecoder before/after varint compression.
+The kaldi HCLG is from aishell's decoding HCLG, which has 3482984 states and 8543232 arcs.
+
+| HCLG FST File               | Size |
+|-----------------------------|------|
+| kaldi openfst               | 197M |
+| xdecoder fst(before varint) | 144M |
+| xdecoder fst(after varint)  | 100M |
+
+We can see the for this HCLG, the final xdecoder varint fst is only half of the kaldi openfst file.
+Compared with the xdecoder fst before varint, the xdecoder fst after varint cut off 44M file size, the compression ratio is 69%.
+I think we can get much bigger compression rate if the original fst is smaller.
+
 
 
 

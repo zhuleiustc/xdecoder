@@ -43,9 +43,14 @@ void Fst::Reset() {
   finals_.clear();
 }
 
-void Fst::ReadTopo(const SymbolTable& isymbol_table,
-                   const SymbolTable& osymbol_table,
-                   const std::string& topo_file) {
+// A stupid implementation, it will be very slow when the
+// isymbol_tabel or osymbol_table is very big, for that
+// SymbolTable is designed for find symbol by id, but aslo
+// have a stupid implementaion of find id by symbol.
+// However,for memory reasons, it's not in an efficient way
+void Fst::ReadTopo(const std::string& topo_file,
+                   const SymbolTable& isymbol_table,
+                   const SymbolTable& osymbol_table) {
   Reset();
   FILE *fp = fopen(topo_file.c_str(), "r");
   if (!fp) {
@@ -77,6 +82,8 @@ void Fst::ReadTopo(const SymbolTable& isymbol_table,
       all_arcs[src].push_back(arc);
     } else if (sscanf(buffer, "%d %f", &src, &weight) == 2) {
       finals_[src] = weight;
+    } else if (sscanf(buffer, "%d", &src) == 1) {
+      finals_[src] = 0.0f;
     } else {
       ERROR("wrong line, expected (src, dest, ilabel, olabel, weight) "
             "or (final, weight) but get %s", buffer);
@@ -94,31 +101,84 @@ void Fst::ReadTopo(const SymbolTable& isymbol_table,
   }
 }
 
+// For directly convert openfst file to xdecoder fst
+void Fst::ReadTopo(const std::string& topo_file) {
+  Reset();
+  FILE *fp = fopen(topo_file.c_str(), "r");
+  if (!fp) {
+    ERROR("file %s not exist", topo_file.c_str());
+  }
+
+  char buffer[1024];
+  int32_t ilabel, olabel;
+  bool first_line = true;
+  int32_t src, dest;
+  float weight = 0.0f;
+
+  std::vector<std::vector<Arc> > all_arcs;
+  while (fgets(buffer, 1024, fp)) {
+    int32_t num = sscanf(buffer, "%d %d %d %d %f",
+                         &src, &dest, &ilabel, &olabel, &weight);
+    if (num >= 4) {
+      if (num == 4) weight = 0;
+      if (first_line) {
+        first_line = false;
+        start_ = src;
+      }
+      Arc arc(ilabel, olabel, weight, dest);
+      if (src >= static_cast<int32_t>(all_arcs.size()))
+        all_arcs.resize(src + 1);
+      if (dest >= static_cast<int32_t>(all_arcs.size()))
+        all_arcs.resize(dest + 1);
+      all_arcs[src].push_back(arc);
+    } else if (sscanf(buffer, "%d %f", &src, &weight) == 2) {
+      finals_[src] = weight;
+    } else if (sscanf(buffer, "%d", &src) == 1) {
+      finals_[src] = 0.0f;
+    } else {
+      ERROR("wrong line, expected (src, dest, ilabel, olabel, weight) "
+            "or (final, weight) but get %s", buffer);
+      break;
+    }
+  }
+  fclose(fp);
+
+  arc_offset_.resize(all_arcs.size());
+  int32_t offset = 0;
+  for (uint32_t i = 0; i < all_arcs.size(); i++) {
+    arc_offset_[i] = offset;
+    arcs_.insert(arcs_.end(), all_arcs[i].begin(), all_arcs[i].end());
+    offset += all_arcs[i].size();
+  }
+}
+
+
+
 // Show the text format fsm info
 void Fst::Info() const {
-  fprintf(stderr, "fst info table\n");
+  printf("fst info table\n");
   // state arc start info
-  fprintf(stderr, "start id:\t%d\n", start_);
-  fprintf(stderr, "num_states:\t%d\n", NumStates());
-  fprintf(stderr, "num_arcs:\t%d\n", NumArcs());
+  printf("start id:\t%d\n", start_);
+  printf("num_states:\t%d\n", NumStates());
+  printf("num_arcs:\t%d\n", NumArcs());
   // final set info
-  fprintf(stderr, "final states:\t%d { ", NumFinals());
+  printf("final states:\t%d { ", NumFinals());
   std::unordered_map<int32_t, float>::const_iterator it = finals_.begin();
   for (; it != finals_.end(); it++) {
-    fprintf(stderr, "(%d, %f) ", it->first, it->second);
+    printf("(%d, %f) ", it->first, it->second);
   }
-  fprintf(stderr, "}\n");
+  printf("}\n");
 
   // state info
   for (int32_t i = 0; i < NumStates(); i++) {
-    fprintf(stderr, "state %d arcs %d: { ", i, NumArcs(i));
+    printf("state %d arcs %d: { ", i, NumArcs(i));
     for (const Arc *arc = ArcStart(i); arc != ArcEnd(i); arc++) {
-      fprintf(stderr, "(%d, %d, %f, %d) ", arc->ilabel,
+      printf("(%d, %d, %f, %d) ", arc->ilabel,
                                            arc->olabel,
                                            arc->weight,
                                            arc->next_state);
     }
-    fprintf(stderr, "}\n");
+    printf("}\n");
   }
 }
 

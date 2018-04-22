@@ -28,6 +28,7 @@ void WriteBasic(std::ostream& os, T t) {
   os.write(reinterpret_cast<char *>(&t), sizeof(T));
 }
 
+#ifdef USE_VARINT
 template<>
 void ReadBasic(std::istream& is, int32_t* t) {
   *t = Varint::ReadInt32(is);
@@ -37,6 +38,7 @@ template<>
 void WriteBasic(std::ostream& os, int32_t t) {
   Varint::WriteInt32(os, t);
 }
+#endif  // USE_VARINT
 
 template void ReadBasic<int32_t>(std::istream& is, int32_t*);
 template void WriteBasic<int32_t>(std::ostream& os, int32_t);

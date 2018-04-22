@@ -41,10 +41,14 @@ int main(int argc, char *argv[]) {
 
   std::string topo_file = po.GetArg(1),
               out_file = po.GetArg(2);
-  SymbolTable isymbol_table(isymbols), osymbol_table(osymbols);
 
   Fst fst;
-  fst.ReadTopo(isymbol_table, osymbol_table, topo_file);
+  if (isymbols == "" || osymbols == "") {
+    fst.ReadTopo(topo_file);
+  } else {
+    SymbolTable isymbol_table(isymbols), osymbol_table(osymbols);
+    fst.ReadTopo(topo_file, isymbol_table, osymbol_table);
+  }
   fst.Write(out_file);
   return 0;
 }

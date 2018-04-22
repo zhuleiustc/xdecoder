@@ -58,12 +58,6 @@ void ReadBasic(std::istream &is, T* t);
 template<class T>
 void WriteBasic(std::ostream &os, T t);
 
-template<>
-void ReadBasic(std::istream &is, int32_t* t);
-
-template<>
-void WriteBasic(std::ostream &os, int32_t t);
-
 }  // namespace xdecoder
 
 #endif  // UTILS_H_

@@ -105,9 +105,10 @@ class Fst {
     }
   }
 
-  void ReadTopo(const SymbolTable& isymbol_table,
-                const SymbolTable& osymbol_table,
-                const std::string& topo_file);
+  void ReadTopo(const std::string& topo_file,
+                const SymbolTable& isymbol_table,
+                const SymbolTable& osymbol_table);
+  void ReadTopo(const std::string& topo_file);
 
   void Read(const std::string& file);
   void Write(const std::string& file) const;

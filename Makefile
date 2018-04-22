@@ -1,6 +1,6 @@
 CXX = g++
 
-CXXFLAGS = -g -std=c++11 -MMD -Wall -I src
+CXXFLAGS = -g -std=c++11 -MMD -Wall -I src -D USE_VARINT
 
 #OBJ = $(patsubst %.cc,%.o,$(wildcard src/*.cc))
 OBJ = src/fst.o src/utils.o
